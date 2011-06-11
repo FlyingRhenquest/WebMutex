@@ -1,0 +1,33 @@
+This is a quick and dirty proof of concept kind. It uses Ruby, haml and
+sinatra. It's probably hideous.
+
+You're probably thinking "Damn dude, why would you do that?" Well I have
+to test a web app that only allows one login at a time. If someone else
+logs into the web app at the same time, I get kicked out. This is a
+"feature."
+
+I host all my tests on Hudson and currently control access with some
+lock plugin or other. However, I only need to log in to my webapp for
+a brief period of time for each test, then I'm done with it. If I use
+the hudson lock thingy, all my tests that use the webapp have to run
+serially.
+
+So I thought, "Ok, well what if I deploy a web service somewhere that
+uses a mutex semaphore to enforce access to my web resources?" This
+attempts to do that, and it seems to work.
+
+Notes from my testing:
+
+ * I added an explicit release mechanism, but if your session goes away
+   ruby seems like it's smart enough to unlock the semaphore. That's
+   pretty neat.
+ * You need to use more than 1 browser to test this.
+ * Links (A linux text-mode browser) seems to be VERY touchy about
+   releasing the session (Going "back" will do it.) It also seems to
+   cache the form on /, so if you go "back" and resubmit, it pretends
+   to get the semaphore, but it doesn't actually make a request to the
+   server again. This results in some seemingly unusual behavior.
+ * I haven't tested it with jmeter yet, but jmeter seems like it's pretty
+   sensible.
+ * Also has no authentication whatsoever built in. What do you want in a
+   proof of concept? :-P 
